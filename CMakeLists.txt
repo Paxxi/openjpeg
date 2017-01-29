@@ -7,7 +7,7 @@
 # For this purpose you can define a CMake var: OPENJPEG_NAMESPACE to whatever you like
 # e.g.:
 # set(OPENJPEG_NAMESPACE "GDCMOPENJPEG")
-cmake_minimum_required(VERSION 2.8.2)
+cmake_minimum_required(VERSION 3.2)
 
 if(COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0003 NEW)
@@ -24,7 +24,7 @@ endif()
 #string(TOLOWER ${OPENJPEG_NAMESPACE} OPENJPEG_LIBRARY_NAME)
 set(OPENJPEG_LIBRARY_NAME openjp2)
 
-project(${OPENJPEG_NAMESPACE} C)
+project(${OPENJPEG_NAMESPACE} VERSION 2.2.0 LANGUAGES C)
 
 # Do full dependency headers.
 include_regular_expression("^.*$")
@@ -75,26 +75,20 @@ set(CMAKE_MODULE_PATH
 # --------------------------------------------------------------------------
 # On Visual Studio 8 MS deprecated C. This removes all 1.276E1265 security
 # warnings
-if(WIN32)
-  if(NOT BORLAND)
-    if(NOT CYGWIN)
-      if(NOT MINGW)
-        if(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
-          add_definitions(
-            -D_CRT_FAR_MAPPINGS_NO_DEPRECATE
-            -D_CRT_IS_WCTYPE_NO_DEPRECATE
-            -D_CRT_MANAGED_FP_NO_DEPRECATE
-            -D_CRT_NONSTDC_NO_DEPRECATE
-            -D_CRT_SECURE_NO_DEPRECATE
-            -D_CRT_SECURE_NO_DEPRECATE_GLOBALS
-            -D_CRT_SETERRORMODE_BEEP_SLEEP_NO_DEPRECATE
-            -D_CRT_TIME_FUNCTIONS_NO_DEPRECATE
-            -D_CRT_VCCLRIT_NO_DEPRECATE
-            -D_SCL_SECURE_NO_DEPRECATE
-            )
-        endif()
-      endif()
-    endif()
+if(MSVC)
+  if(NOT ITK_ENABLE_VISUAL_STUDIO_DEPRECATED_C_WARNINGS)
+    add_definitions(
+      -D_CRT_FAR_MAPPINGS_NO_DEPRECATE
+      -D_CRT_IS_WCTYPE_NO_DEPRECATE
+      -D_CRT_MANAGED_FP_NO_DEPRECATE
+      -D_CRT_NONSTDC_NO_DEPRECATE
+      -D_CRT_SECURE_NO_DEPRECATE
+      -D_CRT_SECURE_NO_DEPRECATE_GLOBALS
+      -D_CRT_SETERRORMODE_BEEP_SLEEP_NO_DEPRECATE
+      -D_CRT_TIME_FUNCTIONS_NO_DEPRECATE
+      -D_CRT_VCCLRIT_NO_DEPRECATE
+      -D_SCL_SECURE_NO_DEPRECATE
+      )
   endif()
 endif()
 
@@ -105,7 +99,8 @@ endif()
 option(BUILD_DOC "Build the HTML documentation (with doxygen if available)." OFF)
 
 string(TOLOWER ${PROJECT_NAME} projectname)
-set(OPENJPEG_INSTALL_SUBDIR "${projectname}-${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}")
+# set(OPENJPEG_INSTALL_SUBDIR "${projectname}-${OPENJPEG_VERSION_MAJOR}.${OPENJPEG_VERSION_MINOR}")
+set(OPENJPEG_INSTALL_SUBDIR ${projectname})
 
 if(NOT OPENJPEG_INSTALL_BIN_DIR)
   set(OPENJPEG_INSTALL_BIN_DIR "bin")
@@ -149,7 +144,7 @@ if(NOT OPENJPEG_INSTALL_PACKAGE_DIR)
   # We could install *.cmake files in share/ however those files contains
   # hardcoded path to libraries on a multi-arch system (fedora/debian) those
   # path will be different (lib/i386-linux-gnu vs lib/x86_64-linux-gnu)
-  set(OPENJPEG_INSTALL_PACKAGE_DIR "${OPENJPEG_INSTALL_LIB_DIR}/${OPENJPEG_INSTALL_SUBDIR}")
+  set(OPENJPEG_INSTALL_PACKAGE_DIR "${OPENJPEG_INSTALL_LIB_DIR}/cmake/${OPENJPEG_INSTALL_SUBDIR}")
 endif()
 
 if (APPLE)
@@ -255,7 +250,7 @@ option(BUILD_LUTS_GENERATOR "Build utility to generate t1_luts.h" OFF)
 
 #-----------------------------------------------------------------------------
 # Build Applications
-option(BUILD_CODEC "Build the CODEC executables" ON)
+option(BUILD_CODEC "Build the CODEC executables" OFF)
 option(BUILD_MJ2 "Build the MJ2 executables." OFF)
 option(BUILD_JPWL "Build the JPWL library and executables" OFF)
 option(BUILD_JPIP "Build the JPIP library and executables." OFF)
